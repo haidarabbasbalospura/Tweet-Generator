@@ -1,12 +1,13 @@
+# Import streamlit first
+import streamlit as st
 from langchain_google_genai import GoogleGenerativeAI
-from langchain import LLMChain , PromptTemplate
-
+from langchain import LLMChain, PromptTemplate
 import os
 import time
 
+# Move API key configuration after streamlit import
+os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
 
-# backend code
-os.environ['GOOGLE_API_KEY'] = st.secrets['GOOGLE_API_KEY']
 
 tweet_template = """
 🎯 **Your Task**: You are a social media manager for a company. Your goal is to craft {number} catchy tweets based on the given topic. 🚀
@@ -27,8 +28,6 @@ gemini_model = GoogleGenerativeAI(model="gemini-1.0-pro")
 tweet_chain = tweet_prompt | gemini_model
 
 # Frontend Code
-
-import streamlit as st
 
 st.title("Tweet Generator")
 
