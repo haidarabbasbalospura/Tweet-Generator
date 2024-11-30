@@ -1,37 +1,53 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain import LLMChain
-from langchain import PromptTemplate
+from langchain_google_genai import GoogleGenerativeAI
+from langchain import LLMChain , PromptTemplate
 
-import streamlit as st
 import os
+import time
 
+
+# backend code
 os.environ['GOOGLE_API_KEY'] = st.secrets['GOOGLE_API_KEY']
 
-# Create prompt template for generating tweets
+tweet_template = """
+🎯 **Your Task**: You are a social media manager for a company. Your goal is to craft {number} catchy tweets based on the given topic. 🚀
 
-tweet_template = "Give me {number} tweets on {topic}"
+📝 **Topic**: {topic} 🌟
 
-tweet_prompt = PromptTemplate(template = tweet_template, input_variables = ['number', 'topic'])
+✨ Get creative and make sure the tweets are fun, engaging, and relevant to the audience! 😎💬
 
-# Initialize Google's Gemini model
-gemini_model = ChatGoogleGenerativeAI(model = "gemini-1.5-flash-latest")
+Let's get tweeting! 📱
+"""
 
 
-# Create LLM chain using the prompt template and model
+tweet_prompt = PromptTemplate(template=tweet_template, input_variables=["topic", "number"])
+
+gemini_model = GoogleGenerativeAI(model="gemini-1.0-pro")
+
+
 tweet_chain = tweet_prompt | gemini_model
 
+# Frontend Code
 
 import streamlit as st
 
-st.header("Tweet Generator")
+st.title("Tweet Generator")
+
 
 st.subheader("Generate tweets using Generative AI")
 
-topic = st.text_input("Topic")
+topic = st.text_input("Enter a topic" , placeholder="Enter a topic")
 
-number = st.number_input("Number of tweets", min_value = 1, max_value = 10, value = 1, step = 1)
 
-if st.button("Generate"):
-    tweets = tweet_chain.invoke({"number" : number, "topic" : topic})
-    st.write(tweets.content)
-    
+
+number = st.number_input("Number of tweets", min_value=1, max_value=50, value=1, step=1)
+
+if st.button("Generate tweets"):
+    if topic == "":
+        st.error("Please enter a topic.")  # Display an error if no input is provided
+    else:
+        with st.spinner('🐦 Generating your tweets...'):  # Shows a spinner with custom message
+            tweets = tweet_chain.invoke({"topic": topic, "number": number})
+        success_message = st.success("✨ Tweets generated successfully!")  # Show success after generation
+        time.sleep(1.5)  # Wait for 1.5 seconds
+        success_message.empty()  # Remove the success message
+        st.write(tweets)
