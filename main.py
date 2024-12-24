@@ -91,12 +91,12 @@ selected_language = st.selectbox(
 topic = st.text_input("Enter a topic", placeholder="Enter a topic")
 number = st.number_input("Number of tweets", min_value=1, max_value=50, value=1, step=1)
 
-def clean_redundant_text(text):
-    # Remove common prefixes like "Tweet 1:", "1.", etc.
-    cleaned = re.sub(r'^(?:\d+\.|Tweet \d+:|\*\*Tweet \d+:\*\*|\d+\))\s*', '', text, flags=re.MULTILINE)
-    # Remove empty lines and strip whitespace
-    cleaned = '\n'.join(line.strip() for line in cleaned.splitlines() if line.strip())
-    return cleaned
+# def clean_redundant_text(text):
+#     # Ensure each tweet starts on a new line and maintain numbering
+#     cleaned = re.sub(r'(\d+\.)\s*', r'\1 ', text)  # Ensure a space follows the number and period
+#     # Split the text into lines, strip whitespace, and join with newlines
+#     cleaned = '\n'.join(line.strip() for line in cleaned.split('. ') if line.strip())
+#     return cleaned
 
 if st.button("Generate tweets"):
     if topic == "":
@@ -108,9 +108,8 @@ if st.button("Generate tweets"):
                 "number": number,
                 "language": selected_language
             })
-            tweets = clean_redundant_text(raw_tweets)
+            tweets = raw_tweets
         success_message = st.success("✨ Tweets generated successfully!")
         time.sleep(1.5)
         success_message.empty()
         st.write(tweets)
-
